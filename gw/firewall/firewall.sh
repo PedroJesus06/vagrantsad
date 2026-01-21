@@ -39,13 +39,24 @@ iptables -A OUTPUT -o eth3 -s 172.2.1.1 -p icmp --icmp-type echo-reply -j ACCEPT
 iptables -A OUTPUT -o eth0 -p udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT
 iptables -A INPUT -i eth0 -p udp --sport 53 -m conntrack --ctstate ESTABLISHED -j ACCEPT
 
-#L5
+#L5. Permitir http/https para actualizar y navegar
+iptables -A OUTPUT -o eth0 -p tcp --dport 80 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --sport 80 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --dport 443 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --sport 443 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
-
+#L6. Permitir solo acceso ssh desde adminpc
+iptables -A INPUT -i eth3 -s 172.2.1.10 -p tcp --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o eth3 -d 172.2.1.10 -p tcp --sport 22 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 ##############################################
 #Reglas de proteccion de red
 ##############################################
+#R1. Se debe hacer NAT desde el trafico saliente
+iptables -t nat -A POSTROUTING -s 172.2.1.0/24 -o eth0 -j MASQUERADE
+#R4. Permitir salir trafico desde la LAN
+iptables -A FORWARD -i eth3 -o eth0 -s 172.2.1.0/24 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth0 -o eth3 -d 172.2.1.0/24 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 ###### Logs para depurar
 iptables -A INPUT -j LOG --log-prefix "PJAO-INPUT: "
