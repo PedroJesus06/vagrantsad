@@ -15,6 +15,7 @@ Vagrant.configure("2") do |config|
     # eth3: LAN
     gw.vm.network "private_network", ip: "172.2.#{N}.1", netmask: "255.255.255.0", virtualbox__intnet: "red_lan"
     gw.vm.provision "shell", path: "gw/provision.sh"   
+    gw.vm.provision "shell", run: "always", path: "gw/firewall/firewall.sh"  
     gw.vm.provider "virtualbox" do |vb|
         vb.name = "gw"
         vb.gui = false
