@@ -56,8 +56,9 @@ iptables -A OUTPUT -o eth3 -d 172.2.1.10 -p tcp --sport 22 -m conntrack --ctstat
 iptables -t nat -A POSTROUTING -s 172.2.1.0/24 -o eth0 -j MASQUERADE
 
 #R2. Permitir acceso desde la WAN a www a traves del 80 y 443 de www
-
-
+iptables -t nat -A PREROUTING -i eth1 -p tcp --dport 80 -j DNAT --to 172.1.1.3:80
+iptables -A FORWARD -i eth1 -o eth2 -s 203.0.113.0/24 -d 172.1.1.3 -p tcp --sport 80 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth1 -s 172.1.1.3 -d 203.0.113.0/24 -p tcp --sport 80 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 #R3a. Usuarios de la LAN pueden acceder a 80 y 443 de www
 iptables -A FORWARD -i eth3 -o eth2 -s 172.2.1.0/24 -d 172.1.1.3 -p tcp --dport 80 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
@@ -72,7 +73,16 @@ iptables -A FORWARD -i eth2 -o eth3 -s 172.1.1.0/24 -d 172.2.1.10 -p tcp --sport
 iptables -A FORWARD -i eth3 -o eth0 -s 172.2.1.0/24 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 iptables -A FORWARD -i eth0 -o eth3 -d 172.2.1.0/24 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
-#R5. Permitir salir trafico de la DMZ 
+#R5. Permitir salir trafico de la DMZ (solo http/https/dns/ntp)
+iptables -t nat -A POSTROUTING -s 172.1.1.0/24 -o eth0 -j MASQUERADE
+iptables -A FORWARD -i eth2 -o eth0 -s 172.1.1.0/24 -p tcp --dport 80 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth0 -s 172.1.1.0/24 -p tcp --dport 443 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth0 -s 172.1.1.0/24 -p udp --dport 53 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+
+iptables -A FORWARD -i eth0 -o eth2 -d 172.1.1.0/24 -p tcp --sport 80 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -i eth0 -o eth2 -d 172.1.1.0/24 -p tcp --sport 443 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -i eth0 -o eth2 -d 172.1.1.0/24 -p udp --sport 53 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
 
 ###### Logs para depurar
 iptables -A INPUT -j LOG --log-prefix "PJAO-INPUT: "
