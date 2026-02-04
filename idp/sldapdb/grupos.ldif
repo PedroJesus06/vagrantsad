@@ -1,0 +1,9 @@
+dn: cn=alumnos,ou=ou_grupos,dc=miau,dc=org
+objectClass: top
+objectClass: posixGroup
+gidNumber: 10000
+
+dn: cn=profesores,ou=ou_grupos,dc=miau,dc=org
+objectClass: top
+objectClass: posixGroup
+gidNumber: 10001
