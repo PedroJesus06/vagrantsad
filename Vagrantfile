@@ -2,6 +2,13 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 N = "1" # Tu número de clase
 iniciales = "pjao"
 
+if File.exist?("./secrets.txt")
+  File.foreach("./secrets.txt") do |line|
+    key, value = line.strip.split('=')
+    ENV[key] = value if key && value
+  end
+end
+
 Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
 # Definición del equipo gw
@@ -32,7 +39,11 @@ Vagrant.configure("2") do |config|
     idp.vm.box = "bento/ubuntu-24.04"
     idp.vm.hostname = "idp-#{iniciales}"
     idp.vm.network "private_network", ip: "172.2.#{N}.2", netmask: "255.255.255.0", virtualbox__intnet: "red_lan"
-    idp.vm.provision "shell", path: "idp/provision.sh"
+    idp.vm.provision "shell",
+      path: "idp/provision.sh",
+      env:{
+        "LDAP_PASS" => ENV['LDAP_PASS']
+      }
     # eliminar default gw en eth0 – red NAT creada por defecto
     idp.vm.provision "shell",
         run: "always",
