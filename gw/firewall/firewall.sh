@@ -83,12 +83,17 @@ iptables -A FORWARD -i eth0 -o eth2 -d 172.1.1.0/24 -p tcp --sport 80 -m conntra
 iptables -A FORWARD -i eth0 -o eth2 -d 172.1.1.0/24 -p tcp --sport 443 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A FORWARD -i eth0 -o eth2 -d 172.1.1.0/24 -p udp --sport 53 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
+#P4 permitir acceso LDAP desde DMZ
+iptables -A FORWARD -i eth2 -o eth3 -s 172.1.99.0/24 -d 172.2.99.2 -p tcp --dport 389 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth3 -o eth2 -s 172.2.99.2 -d 172.1.99.0/24 -p tcp --sport 389 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
 ################################################
 # Reglas para el resto de prácticas
 ################################################
 # Regla P6. Permitir acceso de la LAN al squid de la DMZ
 iptables -A FORWARD -i eth3 -o eth2 -s 172.2.1.0/24 -d 172.1.1.2 -p tcp --dport 3128 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 iptables -A FORWARD -i eth2 -o eth3 -s 172.1.1.2 -d 172.2.1.0/24 -p tcp --sport 3128 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
 
 ###### Logs para depurar
 iptables -A INPUT -j LOG --log-prefix "PJAO-INPUT: "
