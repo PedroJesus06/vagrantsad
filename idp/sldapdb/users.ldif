@@ -1,0 +1,31 @@
+dn: uid=pjao,ou=ou_usuarios,dc=miau,dc=org
+objectClass: top
+objectClass: posixAccount
+objectClass: inetOrgPerson
+objectClass: person
+cn: Pedro Jesus
+givenName: Pedro
+sn: Pajares
+uid: pjesus
+uidNumber: 2000
+gidNumber: 10000
+homeDirectory: /home/pjesus
+loginShell: /bin/bash
+userPassword: {SSHA}P1/7O++4GyQT8QRBGhZ1VmRLUncJSS3P
+mail: pjesus@miau.org
+
+dn: uid=mpp,ou=ou_usuarios,dc=miau,dc=org
+objectClass: top
+objectClass: posixAccount
+objectClass: inetOrgPerson
+objectClass: person
+cn: Marta Perez
+givenName: Marta
+sn: Mperez
+uid: mperez
+uidNumber: 2001
+gidNumber: 10001
+homeDirectory: /home/mperez
+loginShell: /bin/bash
+userPassword: {SSHA}P1/7O++4GyQT8QRBGhZ1VmRLUncJSS3P
+mail: mperez@miau.org
