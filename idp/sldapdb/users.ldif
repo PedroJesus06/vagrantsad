@@ -29,12 +29,3 @@ homeDirectory: /home/mperez
 loginShell: /bin/bash
 userPassword: {SSHA}P1/7O++4GyQT8QRBGhZ1VmRLUncJSS3P
 mail: mperez@miau.org
-
-# Grupo para los que tienen permiso de navegación
-dn: cn=proxy_users,ou=ou_grupos,dc=miau,dc=org
-objectClass: top
-objectClass: posixGroup
-cn: proxy_users
-gidNumber: 10005
-description: Usuarios con permiso para navegar a traves del proxy
-memberUid: pjesus
